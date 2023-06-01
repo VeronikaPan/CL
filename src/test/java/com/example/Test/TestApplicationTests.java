@@ -1,0 +1,12 @@
+//package com.example.Test;
+//
+//import org.springframework.boot.test.context.SpringBootTest;
+//
+//@SpringBootTest
+//class TestApplicationTests {
+//
+//	@Test
+//	void contextLoads() {
+//	}
+//
+//}
