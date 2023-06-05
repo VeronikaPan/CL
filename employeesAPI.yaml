@@ -1,0 +1,107 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Employee API
+paths:
+  /employees:
+    get:
+      summary: Vrátí všechny zaměstnance
+      responses:
+        '200':
+          description: Úspěšná odpověď
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EmployeeDTO'
+        '204':
+          description: Obsah nenalezen
+    post:
+      summary: Přidá zaměstnance
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeDTO'
+      responses:
+        '200':
+          description: Úspěšná odpověď
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeDTO'
+  /employees/{id}:
+    get:
+      summary: Vrátí zaměstnance podle ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Úspěšná odpověď
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeDTO'
+        '404':
+          description: Zaměstnanec nenalezen
+    put:
+      summary: Aktualizuje zaměstnance
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EmployeeDTO'
+      responses:
+        '200':
+          description: Úspěšná odpověď
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeDTO'
+        '400':
+          description: Zaměstnanec s daným ID nebyl nalezen
+    delete:
+      summary: Smaže zaměstnance podle ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Úspěšná odpověď
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeDTO'
+        '404':
+          description: Zaměstnanec nenalezen
+components:
+  schemas:
+    EmployeeDTO:   # Změněný název třídy
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        dateBirth:
+          type: string
+          format: date
