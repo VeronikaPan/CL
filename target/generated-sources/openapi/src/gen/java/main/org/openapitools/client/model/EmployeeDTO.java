@@ -47,7 +47,7 @@ import org.openapitools.client.JSON;
 /**
  * EmployeeDTO
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-06-05T09:24:25.150864200+02:00[Europe/Prague]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-06-05T22:18:23.587857500+02:00[Europe/Prague]")
 public class EmployeeDTO {
   public static final String SERIALIZED_NAME_ID = "id";
   @SerializedName(SERIALIZED_NAME_ID)
@@ -56,6 +56,10 @@ public class EmployeeDTO {
   public static final String SERIALIZED_NAME_NAME = "name";
   @SerializedName(SERIALIZED_NAME_NAME)
   private String name;
+
+  public static final String SERIALIZED_NAME_SURNAME = "surname";
+  @SerializedName(SERIALIZED_NAME_SURNAME)
+  private String surname;
 
   public static final String SERIALIZED_NAME_EMAIL = "email";
   @SerializedName(SERIALIZED_NAME_EMAIL)
@@ -109,6 +113,28 @@ public class EmployeeDTO {
 
   public void setName(String name) {
     this.name = name;
+  }
+
+
+  public EmployeeDTO surname(String surname) {
+    
+    this.surname = surname;
+    return this;
+  }
+
+   /**
+   * Get surname
+   * @return surname
+  **/
+  @javax.annotation.Nullable
+
+  public String getSurname() {
+    return surname;
+  }
+
+
+  public void setSurname(String surname) {
+    this.surname = surname;
   }
 
 
@@ -168,13 +194,14 @@ public class EmployeeDTO {
     EmployeeDTO employeeDTO = (EmployeeDTO) o;
     return Objects.equals(this.id, employeeDTO.id) &&
         Objects.equals(this.name, employeeDTO.name) &&
+        Objects.equals(this.surname, employeeDTO.surname) &&
         Objects.equals(this.email, employeeDTO.email) &&
         Objects.equals(this.dateBirth, employeeDTO.dateBirth);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, email, dateBirth);
+    return Objects.hash(id, name, surname, email, dateBirth);
   }
 
   @Override
@@ -183,6 +210,7 @@ public class EmployeeDTO {
     sb.append("class EmployeeDTO {\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    surname: ").append(toIndentedString(surname)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    dateBirth: ").append(toIndentedString(dateBirth)).append("\n");
     sb.append("}");
@@ -209,6 +237,7 @@ public class EmployeeDTO {
     openapiFields = new HashSet<String>();
     openapiFields.add("id");
     openapiFields.add("name");
+    openapiFields.add("surname");
     openapiFields.add("email");
     openapiFields.add("dateBirth");
 
@@ -238,6 +267,9 @@ public class EmployeeDTO {
       }
       if ((jsonObj.get("name") != null && !jsonObj.get("name").isJsonNull()) && !jsonObj.get("name").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format("Expected the field `name` to be a primitive type in the JSON string but got `%s`", jsonObj.get("name").toString()));
+      }
+      if ((jsonObj.get("surname") != null && !jsonObj.get("surname").isJsonNull()) && !jsonObj.get("surname").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format("Expected the field `surname` to be a primitive type in the JSON string but got `%s`", jsonObj.get("surname").toString()));
       }
       if ((jsonObj.get("email") != null && !jsonObj.get("email").isJsonNull()) && !jsonObj.get("email").isJsonPrimitive()) {
         throw new IllegalArgumentException(String.format("Expected the field `email` to be a primitive type in the JSON string but got `%s`", jsonObj.get("email").toString()));

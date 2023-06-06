@@ -24,6 +24,9 @@ public class Employee {
 	@Column(name = "surname")
 	private String surname;
 	
+	@Column(name = "email")
+	private String email;
+	
 	@Column(name = "dateBirth")
 	private Date dateBirth;
 	
@@ -40,8 +43,7 @@ public class Employee {
 		this.email = email;
 	}
 	
-	@Column(name = "email")
-	private String email;
+	
 	
 	public Long getId() {
 		return id;

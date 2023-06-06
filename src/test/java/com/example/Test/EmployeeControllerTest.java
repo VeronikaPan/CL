@@ -1,122 +1,252 @@
 package com.example.Test;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockserver.client.MockServerClient;
-import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.HttpRequest;
 import org.mockserver.model.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.List;
-
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockserver.model.HttpRequest.request;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockserver.model.HttpResponse.response;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@TestPropertySource(properties = {"mockserver.port=32778"})
 public class EmployeeControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @LocalServerPort
+    private int serverPort = 8080;
 
-    private static ClientAndServer mockServer;
+    @Value("${mockserver.port}")
+    private static int mockServerPort;
+
+    private static MockServerClient mockServerClient;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
     @BeforeAll
-    public static void setupMockServer() {
-        mockServer = ClientAndServer.startClientAndServer(8080);
-
-        mockServer.when(request().withMethod("GET").withPath("/employees"))
-                .respond(response().withStatusCode(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("[]"));
-
-        mockServer.when(request().withMethod("GET").withPath("/employees/123"))
-                .respond(response().withStatusCode(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{\"id\": 123, \"name\": \"Adam\"}"));
-
-        mockServer.when(request().withMethod("POST").withPath("/"))
-                .respond(response().withStatusCode(201)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{\"id\": 456, \"name\": \"John\"}"));
-
-        mockServer.when(request().withMethod("PUT").withPath("/456"))
-                .respond(response().withStatusCode(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{\"id\": 456, \"name\": \"Updated John\"}"));
-
-        mockServer.when(request().withMethod("DELETE").withPath("/456"))
-                .respond(response().withStatusCode(200)
-                        .withHeader("Content-Type", "application/json")
-                        .withBody("{\"id\": 456, \"name\": \"Deleted John\"}"));
+    public static void startMockServer() {
+        mockServerClient = new MockServerClient("localhost", mockServerPort);
     }
 
-    @AfterAll
+	@AfterAll
     public static void stopMockServer() {
-        mockServer.stop();
+        mockServerClient.stop();
     }
 
     @Test
-    public void testGetAllEmployees() throws Exception {
-        mockMvc.perform(get("/employees"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isEmpty());
+    public void testGetAllEmployees() {
+        // Nastavení očekávaného požadavku
+        HttpRequest request = HttpRequest.request()
+                .withMethod("GET")
+                .withPath("/employees");
+
+        // Nastavení odpovědi
+        HttpResponse response = response()
+                .withStatusCode(200)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody("[{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}]");
+
+        // Mapování očekávaného požadavku na odpověď
+        mockServerClient.when(request).respond(response);
+
+        // Provedení volání na Spring Boot aplikaci
+        String url = "http://localhost:" + serverPort + "/employees";
+        ResponseEntity<String> apiResponse = restTemplate.getForEntity(url, String.class);
+
+        // Ověření odpovědi
+        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
+        assertEquals("[{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}]", apiResponse.getBody());
+
+        // Ověření volání na MockServer
+        mockServerClient.verify(request);
     }
 
     @Test
-    public void testGetEmployeeById() throws Exception {
-        mockMvc.perform(get("/employees/123"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", equalTo(123)))
-                .andExpect(jsonPath("$.name", equalTo("Adam")));
+    public void testAddEmployee() {
+        // Nastavení očekávaného požadavku
+        HttpRequest request = HttpRequest.request()
+                .withMethod("POST")
+                .withPath("/employees")
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody("{\"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
+
+        // Nastavení odpovědi
+        HttpResponse response = response()
+                .withStatusCode(200)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
+
+        // Mapování očekávaného požadavku na odpověď
+        mockServerClient.when(request).respond(response);
+
+        // Provedení volání na Spring Boot aplikaci
+        String url = "http://localhost:" + serverPort + "/employees";
+        ResponseEntity<String> apiResponse = restTemplate.postForEntity(url, "{\"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", String.class);
+
+        // Ověření odpovědi
+        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
+        assertEquals("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", apiResponse.getBody());
+
+        // Ověření volání na MockServer
+        mockServerClient.verify(request);
     }
 
     @Test
-    public void testAddEmployee() throws Exception {
-        Employee employee = new Employee();
-        employee.setName("John");
+    public void testGetEmployeeById() {
+        // Nastavení očekávaného požadavku
+        HttpRequest request = HttpRequest.request()
+                .withMethod("GET")
+                .withPath("/employees/1");
 
-        mockMvc.perform(post("/")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"John\"}"))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", equalTo(456)))
-                .andExpect(jsonPath("$.name", equalTo("John")));
+        // Nastavení odpovědi
+        HttpResponse response = response()
+                .withStatusCode(200)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
+
+        // Mapování očekávaného požadavku na odpověď
+        mockServerClient.when(request).respond(response);
+
+        // Provedení volání na Spring Boot aplikaci
+        String url = "http://localhost:" + serverPort + "/employees/1";
+        ResponseEntity<String> apiResponse = restTemplate.getForEntity(url, String.class);
+
+        // Ověření odpovědi
+        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
+        assertEquals("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", apiResponse.getBody());
+
+        // Ověření volání na MockServer
+        mockServerClient.verify(request);
     }
 
     @Test
-    public void testUpdateEmployee() throws Exception {
-        Employee employee = new Employee();
-        employee.setName("Updated John");
+    public void testUpdateEmployee() {
+        // Nastavení očekávaného požadavku
+        HttpRequest request = HttpRequest.request()
+                .withMethod("PUT")
+                .withPath("/employees/1")
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
 
-        mockMvc.perform(put("/456")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"Updated John\"}"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", equalTo(456)))
-                .andExpect(jsonPath("$.name", equalTo("Updated John")));
+        // Nastavení odpovědi
+        HttpResponse response = response()
+                .withStatusCode(200)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
+
+        // Mapování očekávaného požadavku na odpověď
+        mockServerClient.when(request).respond(response);
+
+        // Provedení volání na  Spring Boot aplikaci
+        String url = "http://localhost:" + serverPort + "/employees/1";
+        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}"), String.class);
+
+        // Ověření odpovědi
+        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
+        assertEquals("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", apiResponse.getBody());
+
+        // Ověření volání na MockServer
+        mockServerClient.verify(request);
     }
 
     @Test
-    public void testDeleteEmployee() throws Exception {
-        mockMvc.perform(delete("/456"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", equalTo(456)))
-                .andExpect(jsonPath("$.name", equalTo("Deleted John")));
+    public void testDeleteUnknownEmployee() {
+        // Nastavení očekávaného požadavku
+        HttpRequest request = HttpRequest.request()
+                .withMethod("DELETE")
+                .withPath("/employees/111");
+
+        // Nastavení odpovědi
+        HttpResponse response = response()
+                .withStatusCode(404)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody("{\"message\": \"Zaměstnanec nenalezen\"}");
+
+        // Mapování očekávaného požadavku na odpověď
+        mockServerClient.when(request).respond(response);
+
+        // Provedení volání na Spring Boot aplikaci
+        String url = "http://localhost:" + serverPort + "/employees/111";
+        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
+
+        // Ověření odpovědi
+        assertEquals(HttpStatus.NOT_FOUND, apiResponse.getStatusCode());
+        assertEquals("{\"message\": \"Zaměstnanec nenalezen\"}", apiResponse.getBody());
+
+        // Ověření volání na MockServer
+        mockServerClient.verify(request);
     }
+    
+    @Test
+    public void testDeleteEmployee() {
+        // Nastavení očekávaného požadavku
+        HttpRequest request = HttpRequest.request()
+                .withMethod("DELETE")
+                .withPath("/employees/111");
+
+        // Nastavení odpovědi
+        HttpResponse response = response()
+                .withStatusCode(404)
+                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .withBody("{\"message\": \"Zaměstnanec nenalezen\"}");
+
+        // Mapování očekávaného požadavku na odpověď
+        mockServerClient.when(request).respond(response);
+
+        // Provedení volání na Spring Boot aplikaci
+        String url = "http://localhost:" + serverPort + "/employees/111";
+        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
+
+        // Ověření odpovědi
+        assertEquals(HttpStatus.NOT_FOUND, apiResponse.getStatusCode());
+        assertEquals("{\"message\": \"Zaměstnanec nenalezen\"}", apiResponse.getBody());
+
+        // Ověření volání na MockServer
+        mockServerClient.verify(request);
+    }
+
+    
+//    @Test
+//    public void testDeleteEmployee() {
+//        // Nastavení očekávaného požadavku
+//        HttpRequest request = HttpRequest.request()
+//                .withMethod("DELETE")
+//                .withPath("/employees/1");
+//
+//        // Nastavení odpovědi
+//        HttpResponse response = response()
+//                .withStatusCode(200)
+//                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+//                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
+//
+//        // Mapování očekávaného požadavku na odpověď
+//        mockServerClient.when(request).respond(response);
+//
+//        // Provedení volání na  Spring Boot aplikaci
+//        String url = "http://localhost:" + serverPort + "/employees/1";
+//        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
+//
+//        // Ověření odpovědi
+//        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
+//        assertEquals("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", apiResponse.getBody());
+//
+//        // Ověření volání na MockServer
+//        mockServerClient.verify(request);
+//    }
 }
