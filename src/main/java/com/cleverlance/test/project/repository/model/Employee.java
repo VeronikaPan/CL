@@ -1,4 +1,4 @@
-package com.example.Test;
+package com.cleverlance.test.project.repository.model;
 
 import java.sql.Date;
 

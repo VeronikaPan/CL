@@ -1,5 +1,6 @@
-package com.example.Test;
+package com.cleverlance.test.project;
 
+import com.cleverlance.test.project.repository.model.Employee;
 import java.util.Optional;
 
 import org.mapstruct.Mapper;

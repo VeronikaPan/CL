@@ -1,4 +1,4 @@
-package com.example.Test;
+package com.cleverlance.test.project;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

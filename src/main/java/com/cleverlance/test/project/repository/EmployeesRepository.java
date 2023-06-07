@@ -1,9 +1,7 @@
-package com.example.Test;
+package com.cleverlance.test.project.repository;
 
-import java.util.List;
-
+import com.cleverlance.test.project.repository.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 
 public interface EmployeesRepository extends JpaRepository<Employee, Long> {

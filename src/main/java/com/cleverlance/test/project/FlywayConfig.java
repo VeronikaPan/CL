@@ -1,4 +1,4 @@
-package com.example.Test;
+package com.cleverlance.test.project;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer;
