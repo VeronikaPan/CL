@@ -42,7 +42,7 @@ public class EmployeeService {
 		}else return null;	
 	}
 
-	public Optional<Employee> deleteEmployeeByID(Long id) {
+	public Optional<Employee> deleteEmployeeByID(long id) {
 		Optional<Employee> employeeData = employeesRepository.findById(id);
 		if (employeeData.isPresent()) {
 			employeesRepository.deleteById(id);

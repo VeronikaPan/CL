@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.openapitools.client.model.EmployeeDTO;
+import org.openapitools.api.EmployeesApi;
+//import org.openapitools.client.model.EmployeeDTO;
+import org.openapitools.model.EmployeeDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.swagger.annotations.ApiParam;
 
 @RestController
-public class EmployeeController {
+public class EmployeeController implements EmployeesApi {
 
 	private final EmployeeService employeeService;
 	private final EmployeeMapper employeeMapper;
@@ -31,21 +33,21 @@ public class EmployeeController {
 		this.employeeMapper = employeeMapper;
 	}
 
-	// vrati vsechny zamestnance
-	@GetMapping("/employees")
-	public ResponseEntity<List<EmployeeDTO>> getAllEmployees() {
+	//vrati vsechny zamestnance
+	@Override
+	public ResponseEntity<List<EmployeeDTO>> employeesGet() {
 		List<Employee> employees = employeeService.getAllEmployees();
 		if (employees.isEmpty()) {
 			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
-		List<EmployeeDTO> employeeDTOs = employees.stream().map(employee -> employeeMapper.employeeToDTO(employee))
-				.collect(Collectors.toList());
+		List<org.openapitools.model.EmployeeDTO> employeeDTOs = employees.stream()
+				.map(employee -> employeeMapper.employeeToDTO(employee)).collect(Collectors.toList());
 		return new ResponseEntity<>(employeeDTOs, HttpStatus.OK);
 	}
 
-	// vrati zamestnance podle id
-	@GetMapping("/employees/{id}")
-	public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable("id") long id) {
+	// vrati zamestnance podle ID
+	@Override
+	public ResponseEntity<EmployeeDTO> employeesIdGet(Integer id) {
 		Optional<Employee> employeeData = employeeService.getEmployeeByID(id);
 		if (employeeData.isPresent()) {
 			EmployeeDTO employeeDTO = employeeMapper.employeeToDTO(employeeData.get());
@@ -56,38 +58,41 @@ public class EmployeeController {
 	}
 
 	// prida zamestnance
-	@PostMapping("/")
-	public Employee addEmployee(@RequestBody EmployeeDTO employeeDTO) {
-		Employee employee = employeeMapper.dtoToEmployee(employeeDTO);
-		employeeService.addEmployee(employee);
-		return employee;
+	@Override
+	public ResponseEntity<EmployeeDTO> employeesPost(EmployeeDTO employeeDTO) {
+	    Employee employee = employeeMapper.dtoToEmployee(employeeDTO);
+	    employeeService.addEmployee(employee);
+	    EmployeeDTO createdEmployeeDTO = employeeMapper.employeeToDTO(employee);
+	    return new ResponseEntity<>(createdEmployeeDTO, HttpStatus.OK);
 	}
 
 	// upravi zamestnance
-	@PutMapping("/{id}")
-	public ResponseEntity<EmployeeDTO> updateEmployee(@PathVariable("id") long id,
-			@RequestBody EmployeeDTO updatedEmployeeDTO) {
-		Employee updatedEmployee = employeeMapper.dtoToEmployee(updatedEmployeeDTO);
-		Optional<Employee> employeeData = employeeService.updateEmployee(updatedEmployee);
-		if (employeeData.isPresent()) {
-			EmployeeDTO employeeDTO = employeeMapper.employeeToDTO(employeeData.get());
-			return new ResponseEntity<>(employeeDTO, HttpStatus.OK);
-		} else {
-			throw new IllegalArgumentException("Employee with ID " + id + " not found.");
-		}
+	@Override
+	public ResponseEntity<EmployeeDTO> employeesIdPut(Integer id, EmployeeDTO employeeDTO) {
+	    Employee existingEmployee = employeeService.getEmployeeByID(id)
+	            .orElseThrow(() -> new IllegalArgumentException("Employee with ID " + id + " not found."));
+
+	    Employee updatedEmployee = employeeMapper.dtoToEmployee(employeeDTO);
+	    updatedEmployee.setId(existingEmployee.getId()); // Set the ID of the existing employee
+
+	    Optional<Employee> updatedEmployeeData = employeeService.updateEmployee(updatedEmployee);
+	    if (updatedEmployeeData.isPresent()) {
+	        EmployeeDTO updatedEmployeeDTO = employeeMapper.employeeToDTO(updatedEmployeeData.get());
+	        return new ResponseEntity<>(updatedEmployeeDTO, HttpStatus.OK);
+	    } else {
+	        throw new IllegalArgumentException("Employee with ID " + id + " not found.");
+	    }
 	}
 
 	// smaze zamestnance
-	@DeleteMapping("/{id}")
-	public ResponseEntity<EmployeeDTO> deleteEmployee(
-			@ApiParam(value = "testId", required = true) @PathVariable long id) {
-		Optional<Employee> employeeData = employeeService.deleteEmployeeByID(id);
-		if (employeeData.isPresent()) {
-			EmployeeDTO employeeDTO = employeeMapper.employeeToDTO(employeeData.get());
-			return new ResponseEntity<>(employeeDTO, HttpStatus.OK);
-		} else {
-			throw new IllegalArgumentException("Employee with ID " + id + " not found.");
-		}
+	@Override
+	public ResponseEntity<EmployeeDTO> employeesIdDelete(Integer id) {
+	    Optional<Employee> employeeData = employeeService.deleteEmployeeByID(id);
+	    if (employeeData.isPresent()) {
+	        EmployeeDTO deletedEmployeeDTO = employeeMapper.employeeToDTO(employeeData.get());
+	        return new ResponseEntity<>(deletedEmployeeDTO, HttpStatus.OK);
+	    } else {
+	        throw new IllegalArgumentException("Employee with ID " + id + " not found.");
+	    }
 	}
-
 }

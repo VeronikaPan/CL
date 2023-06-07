@@ -6,7 +6,8 @@ import java.util.Optional;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
-import org.openapitools.client.model.EmployeeDTO;
+//import org.openapitools.client.model.EmployeeDTO;
+import org.openapitools.model.EmployeeDTO;
 import org.springframework.stereotype.Component;
 
 @Component
