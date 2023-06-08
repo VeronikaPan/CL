@@ -12,8 +12,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmployeeService {
 
-	@Autowired
 	private EmployeesRepository employeesRepository;
+
+	public EmployeeService(EmployeesRepository employeeRepository) {
+		this.employeesRepository = employeeRepository;
+	}
 
 	public EmployeesRepository getEmployeesRepository() {
 		return employeesRepository;
@@ -39,7 +42,8 @@ public class EmployeeService {
 		if (employeeData.isPresent()) {
 			employeesRepository.save(updatedEmployee);
 			return employeeData;
-		}else return null;	
+		} else
+			return null;
 	}
 
 	public Optional<Employee> deleteEmployeeByID(long id) {
@@ -47,7 +51,8 @@ public class EmployeeService {
 		if (employeeData.isPresent()) {
 			employeesRepository.deleteById(id);
 			return employeeData;
-		}else return null;
+		} else
+			return null;
 	}
 
 }
