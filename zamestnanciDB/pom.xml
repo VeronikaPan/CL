@@ -183,6 +183,12 @@
 			<version>7.0.0</version>
 		</dependency>
 
+		<!-- Závislost pro Kafka -->
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+		</dependency>
+
 	</dependencies>
 
 

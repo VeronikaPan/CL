@@ -1,21 +1,24 @@
 package com.cleverlance.test.project.service;
 
-import com.cleverlance.test.project.repository.model.Employee;
-import com.cleverlance.test.project.repository.EmployeesRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.cleverlance.test.project.repository.EmployeesRepository;
+import com.cleverlance.test.project.repository.model.Employee;
+import com.cleverlance.test.project.service.kafka.KafkaProducer;
 
 @Service
 public class EmployeeService {
 
 	private EmployeesRepository employeesRepository;
+	private KafkaProducer kafkaProducer;
 
-	public EmployeeService(EmployeesRepository employeeRepository) {
+	public EmployeeService(EmployeesRepository employeeRepository, KafkaProducer kafkaProducer) {
 		this.employeesRepository = employeeRepository;
+		this.kafkaProducer = kafkaProducer;
 	}
 
 	public EmployeesRepository getEmployeesRepository() {
@@ -23,7 +26,11 @@ public class EmployeeService {
 	}
 
 	public void addEmployee(Employee e) {
-		employeesRepository.save(e);
+		if(getEmployeeByID(e.getId()).isEmpty()) {
+			employeesRepository.save(e);
+		}else {
+			kafkaProducer.sendAddResponse("Zamestnanec se zadanym ID uz existuje");
+		}
 	}
 
 	public List<Employee> getAllEmployees() {
@@ -43,6 +50,7 @@ public class EmployeeService {
 			employeesRepository.save(updatedEmployee);
 			return employeeData;
 		} else
+			kafkaProducer.sendUpdateResponse("Zamestnanec se zadanym ID nebyl nalezen v DB");
 			return null;
 	}
 
@@ -52,6 +60,7 @@ public class EmployeeService {
 			employeesRepository.deleteById(id);
 			return employeeData;
 		} else
+			kafkaProducer.sendDeleteResponse("Zamestnanec se zadanym ID nebyl nalezen v DB");
 			return null;
 	}
 
