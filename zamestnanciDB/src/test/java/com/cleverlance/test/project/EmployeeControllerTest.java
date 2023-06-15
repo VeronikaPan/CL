@@ -1,9 +1,10 @@
 //package com.cleverlance.test.project;
 //
+//import static org.junit.jupiter.api.Assertions.assertEquals;
+//import static org.mockserver.model.HttpResponse.response;
+//
 //import org.junit.jupiter.api.AfterAll;
-//import org.junit.jupiter.api.AfterEach;
 //import org.junit.jupiter.api.BeforeAll;
-//import org.junit.jupiter.api.BeforeEach;
 //import org.junit.jupiter.api.Test;
 //import org.mockserver.client.MockServerClient;
 //import org.mockserver.model.HttpRequest;
@@ -21,11 +22,8 @@
 //import org.springframework.test.context.TestPropertySource;
 //import org.springframework.web.client.RestTemplate;
 //
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.mockserver.model.HttpResponse.response;
-//
 //@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@TestPropertySource(properties = {"mockserver.port=32778"})
+//@TestPropertySource(properties = {"mockserver.port=1080"})
 //public class EmployeeControllerTest {
 //
 //    @LocalServerPort

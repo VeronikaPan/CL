@@ -14,11 +14,15 @@ import com.cleverlance.test.project.service.kafka.KafkaProducer;
 public class EmployeeService {
 
 	private EmployeesRepository employeesRepository;
-	private KafkaProducer kafkaProducer;
+	//private KafkaProducer kafkaProducer;
 
-	public EmployeeService(EmployeesRepository employeeRepository, KafkaProducer kafkaProducer) {
+//	public EmployeeService(EmployeesRepository employeeRepository, KafkaProducer kafkaProducer) {
+//		this.employeesRepository = employeeRepository;
+//		this.kafkaProducer = kafkaProducer;
+//	}
+	
+	public EmployeeService(EmployeesRepository employeeRepository) {
 		this.employeesRepository = employeeRepository;
-		this.kafkaProducer = kafkaProducer;
 	}
 
 	public EmployeesRepository getEmployeesRepository() {
@@ -29,7 +33,7 @@ public class EmployeeService {
 		if(getEmployeeByID(e.getId()).isEmpty()) {
 			employeesRepository.save(e);
 		}else {
-			kafkaProducer.sendAddResponse("Zamestnanec se zadanym ID uz existuje");
+			//kafkaProducer.sendAddResponse("Zamestnanec se zadanym ID uz existuje");
 		}
 	}
 
@@ -50,7 +54,7 @@ public class EmployeeService {
 			employeesRepository.save(updatedEmployee);
 			return employeeData;
 		} else
-			kafkaProducer.sendUpdateResponse("Zamestnanec se zadanym ID nebyl nalezen v DB");
+			//kafkaProducer.sendUpdateResponse("Zamestnanec se zadanym ID nebyl nalezen v DB");
 			return null;
 	}
 
@@ -60,7 +64,7 @@ public class EmployeeService {
 			employeesRepository.deleteById(id);
 			return employeeData;
 		} else
-			kafkaProducer.sendDeleteResponse("Zamestnanec se zadanym ID nebyl nalezen v DB");
+			//kafkaProducer.sendDeleteResponse("Zamestnanec se zadanym ID nebyl nalezen v DB");
 			return null;
 	}
 

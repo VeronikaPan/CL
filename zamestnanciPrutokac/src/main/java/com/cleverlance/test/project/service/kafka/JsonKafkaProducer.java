@@ -3,6 +3,7 @@ package com.cleverlance.test.project.service.kafka;
 import org.openapitools.model.EmployeeDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
@@ -16,7 +17,10 @@ import com.cleverlance.test.project.repository.model.Employee;
 public class JsonKafkaProducer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JsonKafkaProducer.class);
-	private KafkaTemplate<String, Employee> kafkaTemplate;
+	
+	@Autowired
+	private KafkaTemplate<String, EmployeeDTO> kafkaTemplate;
+	
 	@Value("${spring.kafka.topic-add.name}")
 	private String addEmployeeTopic;
 	@Value("${spring.kafka.topic-update.name}")
@@ -24,9 +28,7 @@ public class JsonKafkaProducer {
 	@Value("${spring.kafka.topic-delete.name}")
 	private String deleteEmployeeTopic;
 
-	public JsonKafkaProducer(KafkaTemplate<String, Employee> kafkaTemplate) {
-		this.kafkaTemplate = kafkaTemplate;
-	}
+	
 
 	public void sendMessageAdd(EmployeeDTO employee) {
 		LOGGER.info(String.format("Message for add sent -> %s", employee.toString()));
@@ -35,7 +37,7 @@ public class JsonKafkaProducer {
 		kafkaTemplate.send(message);
 	}
 
-	public void sendMessageUpdate(EmployeeDTO employee, int id) {
+	public void sendMessageUpdate(EmployeeDTO employee) {
 		LOGGER.info(String.format("Message for update sent -> %s", employee.toString()));
 		Message<EmployeeDTO> message = MessageBuilder.withPayload(employee)
 				.setHeader(KafkaHeaders.TOPIC, updateEmployeeTopic).build();
@@ -48,4 +50,6 @@ public class JsonKafkaProducer {
 				.build();
 		kafkaTemplate.send(message);
 	}
+	
+	
 }

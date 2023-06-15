@@ -21,11 +21,10 @@ public class EmployeeService {
 
 	private String urlAnotherRestApi = "http://localhost:8080/employees/";
 	private JsonKafkaProducer kafkaProducer;
-	@Autowired
 	private RestTemplate restTemplate;
 
 
-	public EmployeeService(JsonKafkaProducer kafkaProducer) {
+	public EmployeeService(RestTemplate restTemplate, JsonKafkaProducer kafkaProducer) {
 		this.kafkaProducer = kafkaProducer;
 	}
 
@@ -51,11 +50,12 @@ public class EmployeeService {
 		kafkaProducer.sendMessageAdd(e);
 	}
 
-	public void updateEmployee(int id, EmployeeDTO updatedEmployee) {
-		kafkaProducer.sendMessageUpdate(updatedEmployee, id);
+	public void updateEmployee(long id, EmployeeDTO updatedEmployee) {
+		updatedEmployee.setId( id);
+		kafkaProducer.sendMessageUpdate(updatedEmployee);
 	}
 
-	public void deleteEmployeeByID(int id) {
+	public void deleteEmployeeByID(long id) {
 		kafkaProducer.sendMessageDelete(id);
 	}
 
