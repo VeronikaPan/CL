@@ -1,0 +1,15 @@
+{
+  "inputSpec": "${project.basedir}/employeesAPI.yaml",
+  "generatorName": "spring",
+  "configOptions": {
+    "sourceFolder": "src/gen/java/main",
+    "useOptionalForNullableObjectProperties": true
+  },
+  "additionalProperties": {
+    "java8": true,
+    "interfaceOnly": true
+  },
+  "ignoreFileOverride": [
+    "EmployeeDTO.java"
+  ]
+}

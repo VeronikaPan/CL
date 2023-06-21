@@ -6,6 +6,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.junit.jupiter.api.AfterEach;
@@ -44,7 +45,12 @@ public class EmployeeServiceTest {
 	@Test
 	public void canAddEmployee() {
 		// given
-		Employee e = new Employee(1l, "Josef", "Novak", Date.valueOf("2023-06-01"), "novak@gmail.com");
+		Employee e = new Employee();
+		e.setId(1l);
+		e.setDateBirth(LocalDate.now());
+		e.setName("Josef");
+		e.setSurname("Novak");
+		e.setEmail("josefNovak@gmail.com");
 
 		// when
 		underTest.addEmployee(e);
@@ -71,7 +77,7 @@ public class EmployeeServiceTest {
 		Long employeeId = 123L;
 
 		// when
-		underTest.getEmployeeByID(employeeId);
+		underTest.findEmployeeByID(employeeId);
 
 		// then
 		ArgumentCaptor<Long> idArgumentCaptor = ArgumentCaptor.forClass(Long.class);
@@ -85,10 +91,15 @@ public class EmployeeServiceTest {
 	public void canUpdateEmployee() {
 		// given
 		long employeeId = 123L;
-		Employee updatedEmployee = new Employee(employeeId, "Pepa", "Upraveny", Date.valueOf("2023-06-01"),
-				"novak@gmail.com");
-		Optional<Employee> employeeData = Optional
-				.of(new Employee(employeeId, "Josef", "Novak", Date.valueOf("2023-06-01"), "novak@gmail.com"));
+
+		Employee updatedEmployee = new Employee();
+		updatedEmployee.setId(employeeId);
+		updatedEmployee.setDateBirth(LocalDate.now());
+		updatedEmployee.setName("Pepa");
+		updatedEmployee.setSurname("Upraveny");
+		updatedEmployee.setEmail("josefNovak@gmail.com");
+
+		Optional<Employee> employeeData = Optional.of(updatedEmployee);
 
 		when(employeeRepository.findById(employeeId)).thenReturn(employeeData);
 
@@ -104,8 +115,13 @@ public class EmployeeServiceTest {
 	public void canDeleteEmployeeByID() {
 		// given
 		long employeeId = 123L;
-		Optional<Employee> employeeData = Optional
-				.of(new Employee(employeeId, "Josef", "Novak", Date.valueOf("2023-06-01"), "novak@gmail.com"));
+		Employee deletedEmployee = new Employee();
+		deletedEmployee.setId(employeeId);
+		deletedEmployee.setDateBirth(LocalDate.now());
+		deletedEmployee.setName("Pepa");
+		deletedEmployee.setSurname("Upraveny");
+		deletedEmployee.setEmail("josefNovak@gmail.com");
+		Optional<Employee> employeeData = Optional.of(deletedEmployee);
 
 		when(employeeRepository.findById(employeeId)).thenReturn(employeeData);
 

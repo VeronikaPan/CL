@@ -2,9 +2,8 @@ package com.cleverlance.test.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Optional;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +30,13 @@ public class EmployeeRepositoryTest {
 	@Test
 	void itShouldCheckIfEmployeeExistsID() {
 		// given
-		Employee employee = new Employee(null, "Josef", "Novak", Date.valueOf("2023-06-01"), "novak@gmail.com");
+		Employee employee = new Employee();
+		employee.setId(null);
+		employee.setDateBirth(LocalDate.now());
+		employee.setName("Pepa");
+		employee.setSurname("Upraveny");
+		employee.setEmail("josefNovak@gmail.com");
+		
 		underTest.save(employee);
 
 		// when
@@ -56,7 +61,12 @@ public class EmployeeRepositoryTest {
 	@Test
 	void itShouldCheckIfEmployeeWasDeleted() {
 		// given
-		Employee employee = new Employee(null, "Josef", "Novak", Date.valueOf("2023-06-01"), "novak@gmail.com");
+		Employee employee = new Employee();
+		employee.setDateBirth(LocalDate.now());
+		employee.setName("Pepa");
+		employee.setSurname("Upraveny");
+		employee.setEmail("josefNovak@gmail.com");
+		
 		underTest.save(employee);
 
 		// when
@@ -69,11 +79,22 @@ public class EmployeeRepositoryTest {
 	
 	@Test
 	void itShouldCheckIfEmployeeWasUpdated() {
-		Employee employee = new Employee(null, "Josef", "Novak", Date.valueOf("2023-06-01"), "novak@gmail.com");
+		Employee employee = new Employee();
+		employee.setDateBirth(LocalDate.now());
+		employee.setName("Josef");
+		employee.setSurname("Novak");
+		employee.setEmail("josefNovak@gmail.com");
 		underTest.save(employee);
+		
+		Employee employee2 = new Employee();
+		employee2.setId(employee.getId());
+		employee2.setDateBirth(LocalDate.now());
+		employee2.setName("Pepa");
+		employee2.setSurname("Upraveny");
+		employee2.setEmail("novak@gmail.com");
 
 		// when
-		Employee updatedEmployee = new Employee(employee.getId(), "Pepa", "Upraveny", Date.valueOf("2023-06-01"), "novak@gmail.com");
+		Employee updatedEmployee = employee2;
 		underTest.save(updatedEmployee);
 		Optional<Employee> expectedEmployee = underTest.findById(employee.getId());
 
@@ -82,5 +103,4 @@ public class EmployeeRepositoryTest {
 		assertThat(expectedEmployee.get().getName()).isEqualTo("Pepa");
 		assertThat(expectedEmployee.get().getSurname()).isEqualTo("Upraveny");
 	}
-
 }

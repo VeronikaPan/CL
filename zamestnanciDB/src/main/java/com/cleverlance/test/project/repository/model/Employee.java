@@ -1,6 +1,6 @@
 package com.cleverlance.test.project.repository.model;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +9,16 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString
 @Entity
 @Table(name = "employees")
 public class Employee {
@@ -18,72 +27,16 @@ public class Employee {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 	
-	@Column(name = "name")
+	@Column(name = "name", nullable = false)
 	private String name;
 	
-	@Column(name = "surname")
+	@Column(name = "surname", nullable = false)
 	private String surname;
 	
-	@Column(name = "email")
-	private String email;
-	
-	@Column(name = "dateBirth")
-	private Date dateBirth;
-	
-	public Employee() {
-		
-	}
-	
-	public Employee(Long id, String name, String surname, Date dateBirth, String email) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.surname = surname;
-		this.dateBirth = dateBirth;
-		this.email = email;
-	}
-	
-	
-	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
-	public String getSurname() {
-		return surname;
-	}
-	public void setSurname(String surname) {
-		this.surname = surname;
-	}
-	public Date getDateBirth() {
-		return dateBirth;
-	}
-	public void setDateBirth(Date dateBirth) {
-		this.dateBirth = dateBirth;
-	}
-	public String getEmail() {
-		return email;
-	}
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	@Override
-	public String toString() {
-		return "Employee [id=" + id + ", name=" + name + ", surname=" + surname + ", dateBirth=" + dateBirth + ", email=" + email+ "]";
-	}
-	
-	
-	
+	@Column(name = "dateBirth", nullable = false)
+	private LocalDate dateBirth;
 
-	
+	@Column(name = "email", nullable = false)
+	private String email;
 	
 }

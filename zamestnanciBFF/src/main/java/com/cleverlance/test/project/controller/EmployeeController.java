@@ -33,7 +33,7 @@ public class EmployeeController implements EmployeesApi {
 		this.employeeMapper = employeeMapper;
 	}
 
-	//vrati vsechny zamestnance
+	// vrati vsechny zamestnance
 	@Override
 	public ResponseEntity<List<EmployeeDTO>> employeesGet() {
 		List<Employee> employees = employeeService.getAllEmployees();
@@ -48,9 +48,12 @@ public class EmployeeController implements EmployeesApi {
 	// vrati zamestnance podle ID
 	@Override
 	public ResponseEntity<EmployeeDTO> employeesIdGet(Integer id) {
-		Optional<Employee> employeeData = employeeService.findEmployeeByID(id);
-		if (employeeData.isPresent()) {
-			EmployeeDTO employeeDTO = employeeMapper.employeeToDTO(employeeData.get());
+		ResponseEntity<Employee> existingEmployee = employeeService.getEmployeeByID(id);
+		if (existingEmployee.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+			throw new IllegalArgumentException("Employee with ID " + id + " not found.");
+		}
+		if (existingEmployee.getBody() != null) {
+			EmployeeDTO employeeDTO = employeeMapper.employeeToDTO(existingEmployee.getBody());
 			return new ResponseEntity<>(employeeDTO, HttpStatus.OK);
 		} else {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -60,39 +63,35 @@ public class EmployeeController implements EmployeesApi {
 	// prida zamestnance
 	@Override
 	public ResponseEntity<EmployeeDTO> employeesPost(EmployeeDTO employeeDTO) {
-	    Employee employee = employeeMapper.dtoToEmployee(employeeDTO);
-	    employeeService.addEmployee(employee);
-	    EmployeeDTO createdEmployeeDTO = employeeMapper.employeeToDTO(employee);
-	    return new ResponseEntity<>(createdEmployeeDTO, HttpStatus.OK);
+		employeeService.addEmployee(employeeDTO);
+		return new ResponseEntity<>(employeeDTO, HttpStatus.OK);
 	}
 
 	// upravi zamestnance
 	@Override
-	public ResponseEntity<EmployeeDTO> employeesIdPut(Integer id, EmployeeDTO employeeDTO) {
-	    Employee existingEmployee = employeeService.findEmployeeByID(id)
-	            .orElseThrow(() -> new IllegalArgumentException("Employee with ID " + id + " not found."));
+	public ResponseEntity<EmployeeDTO> employeesIdPut(Integer id, EmployeeDTO updatedEmployee) {
+		ResponseEntity<Employee> existingEmployee = employeeService.getEmployeeByID(id);
+		if (existingEmployee.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+			throw new IllegalArgumentException("Employee with ID " + id + " not found.");
+		}
 
-	    Employee updatedEmployee = employeeMapper.dtoToEmployee(employeeDTO);
-	    updatedEmployee.setId(existingEmployee.getId()); // Set the ID of the existing employee
+		updatedEmployee.setId(existingEmployee.getBody().getId()); // Set the ID of the existing employee
 
-	    Optional<Employee> updatedEmployeeData = employeeService.updateEmployee(updatedEmployee);
-	    if (updatedEmployeeData.isPresent()) {
-	        EmployeeDTO updatedEmployeeDTO = employeeMapper.employeeToDTO(updatedEmployeeData.get());
-	        return new ResponseEntity<>(updatedEmployeeDTO, HttpStatus.OK);
-	    } else {
-	        throw new IllegalArgumentException("Employee with ID " + id + " not found.");
-	    }
+		employeeService.updateEmployee(id, updatedEmployee);
+		return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
 	}
 
 	// smaze zamestnance
 	@Override
 	public ResponseEntity<EmployeeDTO> employeesIdDelete(Integer id) {
-	    Optional<Employee> employeeData = employeeService.deleteEmployeeByID(id);
-	    if (employeeData.isPresent()) {
-	        EmployeeDTO deletedEmployeeDTO = employeeMapper.employeeToDTO(employeeData.get());
-	        return new ResponseEntity<>(deletedEmployeeDTO, HttpStatus.OK);
-	    } else {
-	        throw new IllegalArgumentException("Employee with ID " + id + " not found.");
-	    }
+		ResponseEntity<Employee> existingEmployee = employeeService.getEmployeeByID(id);
+		if (existingEmployee.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
+			throw new IllegalArgumentException("Employee with ID " + id + " not found.");
+		}
+
+		employeeService.deleteEmployeeByID(id);
+		EmployeeDTO deletedEmployeeDTO = employeeMapper.employeeToDTO(existingEmployee.getBody());
+		return new ResponseEntity<>(deletedEmployeeDTO, HttpStatus.OK);
+
 	}
 }

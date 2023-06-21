@@ -1,250 +1,154 @@
-//package com.cleverlance.test.project;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.mockserver.model.HttpResponse.response;
-//
-//import org.junit.jupiter.api.AfterAll;
-//import org.junit.jupiter.api.BeforeAll;
-//import org.junit.jupiter.api.Test;
-//import org.mockserver.client.MockServerClient;
-//import org.mockserver.model.HttpRequest;
-//import org.mockserver.model.HttpResponse;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.web.server.LocalServerPort;
-//import org.springframework.http.HttpEntity;
-//import org.springframework.http.HttpHeaders;
-//import org.springframework.http.HttpMethod;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.MediaType;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.test.context.TestPropertySource;
-//import org.springframework.web.client.RestTemplate;
-//
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-//@TestPropertySource(properties = {"mockserver.port=1080"})
-//public class EmployeeControllerTest {
-//
-//    @LocalServerPort
-//    private int serverPort = 8080;
-//
-//    @Value("${mockserver.port}")
-//    private static int mockServerPort;
-//
-//    private static MockServerClient mockServerClient;
-//
-//    @Autowired
-//    private RestTemplate restTemplate;
-//
-//    @BeforeAll
-//    public static void startMockServer() {
-//        mockServerClient = new MockServerClient("localhost", mockServerPort);
-//    }
-//
-//	@AfterAll
-//    public static void stopMockServer() {
-//        mockServerClient.stop();
-//    }
-//
-//    @Test
-//    public void testGetAllEmployees() {
-//        // Nastavení očekávaného požadavku
-//        HttpRequest request = HttpRequest.request()
-//                .withMethod("GET")
-//                .withPath("/employees");
-//
-//        // Nastavení odpovědi
-//        HttpResponse response = response()
-//                .withStatusCode(200)
-//                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .withBody("[{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}]");
-//
-//        // Mapování očekávaného požadavku na odpověď
-//        mockServerClient.when(request).respond(response);
-//
-//        // Provedení volání na Spring Boot aplikaci
-//        String url = "http://localhost:" + serverPort + "/employees";
-//        ResponseEntity<String> apiResponse = restTemplate.getForEntity(url, String.class);
-//
-//        // Ověření odpovědi
-//        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
-//        assertEquals("[{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}]", apiResponse.getBody());
-//
-//        // Ověření volání na MockServer
-//        mockServerClient.verify(request);
-//    }
-//
-//    @Test
-//    public void testAddEmployee() {
-//        // Nastavení očekávaného požadavku
-//        HttpRequest request = HttpRequest.request()
-//                .withMethod("POST")
-//                .withPath("/employees")
-//                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .withBody("{\"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
-//
-//        // Nastavení odpovědi
-//        HttpResponse response = response()
-//                .withStatusCode(200)
-//                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
-//
-//        // Mapování očekávaného požadavku na odpověď
-//        mockServerClient.when(request).respond(response);
-//
-//        // Provedení volání na Spring Boot aplikaci
-//        String url = "http://localhost:" + serverPort + "/employees";
-//        ResponseEntity<String> apiResponse = restTemplate.postForEntity(url, "{\"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", String.class);
-//
-//        // Ověření odpovědi
-//        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
-//        assertEquals("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", apiResponse.getBody());
-//
-//        // Ověření volání na MockServer
-//        mockServerClient.verify(request);
-//    }
-//
-//    @Test
-//    public void testGetEmployeeById() {
-//        // Nastavení očekávaného požadavku
-//        HttpRequest request = HttpRequest.request()
-//                .withMethod("GET")
-//                .withPath("/employees/1");
-//
-//        // Nastavení odpovědi
-//        HttpResponse response = response()
-//                .withStatusCode(200)
-//                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
-//
-//        // Mapování očekávaného požadavku na odpověď
-//        mockServerClient.when(request).respond(response);
-//
-//        // Provedení volání na Spring Boot aplikaci
-//        String url = "http://localhost:" + serverPort + "/employees/1";
-//        ResponseEntity<String> apiResponse = restTemplate.getForEntity(url, String.class);
-//
-//        // Ověření odpovědi
-//        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
-//        assertEquals("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", apiResponse.getBody());
-//
-//        // Ověření volání na MockServer
-//        mockServerClient.verify(request);
-//    }
-//
-//    @Test
-//    public void testUpdateEmployee() {
-//        // Nastavení očekávaného požadavku
-//        HttpRequest request = HttpRequest.request()
-//                .withMethod("PUT")
-//                .withPath("/employees/1")
-//                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
-//
-//        // Nastavení odpovědi
-//        HttpResponse response = response()
-//                .withStatusCode(200)
-//                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
-//
-//        // Mapování očekávaného požadavku na odpověď
-//        mockServerClient.when(request).respond(response);
-//
-//        // Provedení volání na  Spring Boot aplikaci
-//        String url = "http://localhost:" + serverPort + "/employees/1";
-//        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.PUT, new HttpEntity<>("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}"), String.class);
-//
-//        // Ověření odpovědi
-//        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
-//        assertEquals("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", apiResponse.getBody());
-//
-//        // Ověření volání na MockServer
-//        mockServerClient.verify(request);
-//    }
-//
-//    @Test
-//    public void testDeleteUnknownEmployee() {
-//        // Nastavení očekávaného požadavku
-//        HttpRequest request = HttpRequest.request()
-//                .withMethod("DELETE")
-//                .withPath("/employees/111");
-//
-//        // Nastavení odpovědi
-//        HttpResponse response = response()
-//                .withStatusCode(404)
-//                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .withBody("{\"message\": \"Zaměstnanec nenalezen\"}");
-//
-//        // Mapování očekávaného požadavku na odpověď
-//        mockServerClient.when(request).respond(response);
-//
-//        // Provedení volání na Spring Boot aplikaci
-//        String url = "http://localhost:" + serverPort + "/employees/111";
-//        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
-//
-//        // Ověření odpovědi
-//        assertEquals(HttpStatus.NOT_FOUND, apiResponse.getStatusCode());
-//        assertEquals("{\"message\": \"Zaměstnanec nenalezen\"}", apiResponse.getBody());
-//
-//        // Ověření volání na MockServer
-//        mockServerClient.verify(request);
-//    }
-//    
-//    @Test
-//    public void testDeleteEmployee() {
-//        // Nastavení očekávaného požadavku
-//        HttpRequest request = HttpRequest.request()
-//                .withMethod("DELETE")
-//                .withPath("/employees/111");
-//
-//        // Nastavení odpovědi
-//        HttpResponse response = response()
-//                .withStatusCode(404)
-//                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-//                .withBody("{\"message\": \"Zaměstnanec nenalezen\"}");
-//
-//        // Mapování očekávaného požadavku na odpověď
-//        mockServerClient.when(request).respond(response);
-//
-//        // Provedení volání na Spring Boot aplikaci
-//        String url = "http://localhost:" + serverPort + "/employees/111";
-//        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
-//
-//        // Ověření odpovědi
-//        assertEquals(HttpStatus.NOT_FOUND, apiResponse.getStatusCode());
-//        assertEquals("{\"message\": \"Zaměstnanec nenalezen\"}", apiResponse.getBody());
-//
-//        // Ověření volání na MockServer
-//        mockServerClient.verify(request);
-//    }
-//
-//    
-////    @Test
-////    public void testDeleteEmployee() {
-////        // Nastavení očekávaného požadavku
-////        HttpRequest request = HttpRequest.request()
-////                .withMethod("DELETE")
-////                .withPath("/employees/1");
-////
-////        // Nastavení odpovědi
-////        HttpResponse response = response()
-////                .withStatusCode(200)
-////                .withHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-////                .withBody("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}");
-////
-////        // Mapování očekávaného požadavku na odpověď
-////        mockServerClient.when(request).respond(response);
-////
-////        // Provedení volání na  Spring Boot aplikaci
-////        String url = "http://localhost:" + serverPort + "/employees/1";
-////        ResponseEntity<String> apiResponse = restTemplate.exchange(url, HttpMethod.DELETE, null, String.class);
-////
-////        // Ověření odpovědi
-////        assertEquals(HttpStatus.OK, apiResponse.getStatusCode());
-////        assertEquals("{\"id\": 1, \"name\": \"John Doe\", \"email\": \"john.doe@example.com\", \"dateBirth\": \"1990-01-01\"}", apiResponse.getBody());
-////
-////        // Ověření volání na MockServer
-////        mockServerClient.verify(request);
-////    }
-//}
+package com.cleverlance.test.project;
+
+import com.cleverlance.test.project.repository.model.Employee;
+import com.cleverlance.test.project.EmployeeMapper;
+import com.cleverlance.test.project.controller.EmployeeController;
+import com.cleverlance.test.project.service.EmployeeService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.openapitools.model.EmployeeDTO;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import java.time.LocalDate;
+import java.util.Optional;
+import java.util.stream.Stream;
+
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+class EmployeeControllerTest {
+    private EmployeeController employeeController;
+    @Mock
+    private EmployeeService employeeService;
+    @Mock
+    private EmployeeMapper employeeMapper;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.initMocks(this);
+        employeeController = new EmployeeController(employeeService, employeeMapper);
+    }
+
+
+    private static Stream<EmployeeDTO> provideEmployeeDTOs() {
+        EmployeeDTO employee1 = new EmployeeDTO();
+        employee1.setId(1l);
+        employee1.setName("John");
+        employee1.setSurname("Doe");
+        employee1.setDateBirth(LocalDate.now());
+        employee1.setEmail("pokus@gmail.com");
+        
+        EmployeeDTO employee2 = new EmployeeDTO();
+        employee2.setId(2l);
+        employee2.setName("Jane");
+        employee2.setSurname("Smith");
+        employee2.setDateBirth(LocalDate.now());
+        employee2.setEmail("lkjlskjglas@gmail.com");
+        return Stream.of(employee1, employee2);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEmployeeDTOs")
+    void testEmployeesPost(EmployeeDTO requestDTO) {
+        // Arrange
+        Employee employee = new Employee(requestDTO.getId(), requestDTO.getName(), requestDTO.getSurname(),requestDTO.getDateBirth(), requestDTO.getEmail());
+
+        when(employeeMapper.dtoToEmployee(requestDTO)).thenReturn(employee);        
+        when(employeeMapper.employeeToDTO(employee)).thenReturn(requestDTO);
+
+        // Act
+        ResponseEntity<EmployeeDTO> response = employeeController.employeesPost(requestDTO);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(requestDTO, response.getBody());
+        verify(employeeMapper, times(1)).dtoToEmployee(requestDTO);
+        verify(employeeService, times(1)).addEmployee(employee);
+        verify(employeeMapper, times(1)).employeeToDTO(employee);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEmployeeDTOs")
+    void testEmployeesIdPut_ExistingEmployee(EmployeeDTO requestDTO) {
+        // Arrange
+        int employeeId = requestDTO.getId().intValue();
+        Employee existingEmployee = new Employee(requestDTO.getId(), "John", "Doe", LocalDate.now(), "blals@gmail.com");
+        Employee updatedEmployee = new Employee(requestDTO.getId(), requestDTO.getName(), requestDTO.getSurname(), requestDTO.getDateBirth(), requestDTO.getEmail());
+
+        when(employeeService.findEmployeeByID(employeeId)).thenReturn(Optional.of(existingEmployee));
+        when(employeeMapper.dtoToEmployee(requestDTO)).thenReturn(updatedEmployee);
+        when(employeeService.updateEmployee(updatedEmployee)).thenReturn(Optional.of(updatedEmployee));
+        when(employeeMapper.employeeToDTO(updatedEmployee)).thenReturn(requestDTO);
+
+        // Act
+        ResponseEntity<EmployeeDTO> response = employeeController.employeesIdPut(employeeId, requestDTO);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(requestDTO, response.getBody());
+        verify(employeeService, times(1)).findEmployeeByID(employeeId);
+        verify(employeeMapper, times(1)).dtoToEmployee(requestDTO);
+        verify(employeeService, times(1)).updateEmployee(updatedEmployee);
+        verify(employeeMapper, times(1)).employeeToDTO(updatedEmployee);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEmployeeDTOs")
+    void testEmployeesIdPut_NonExistingEmployee(EmployeeDTO requestDTO) {
+        // Arrange
+        int employeeId = requestDTO.getId().intValue();
+
+        when(employeeService.findEmployeeByID(employeeId)).thenReturn(Optional.empty());
+
+        // Act and Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                employeeController.employeesIdPut(employeeId, requestDTO));
+        assertEquals("Employee with ID " + employeeId + " not found.", exception.getMessage());
+        verify(employeeService, times(1)).findEmployeeByID(employeeId);
+        verify(employeeMapper, never()).dtoToEmployee(any(EmployeeDTO.class));
+        verify(employeeService, never()).updateEmployee(any(Employee.class));
+        verify(employeeMapper, never()).employeeToDTO(any(Employee.class));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEmployeeDTOs")
+    void testEmployeesIdDelete_ExistingEmployee(EmployeeDTO requestDTO) {
+        // Arrange
+        int employeeId = requestDTO.getId().intValue();
+        Employee existingEmployee = new Employee(requestDTO.getId(), "John", "Doe", LocalDate.now(), "boaoa@gmail.com");
+
+        when(employeeService.deleteEmployeeByID(employeeId)).thenReturn(Optional.of(existingEmployee));
+        when(employeeMapper.employeeToDTO(existingEmployee)).thenReturn(requestDTO);
+
+        // Act
+        ResponseEntity<EmployeeDTO> response = employeeController.employeesIdDelete(employeeId);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(requestDTO, response.getBody());
+        verify(employeeService, times(1)).deleteEmployeeByID(employeeId);
+        verify(employeeMapper, times(1)).employeeToDTO(existingEmployee);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideEmployeeDTOs")
+    void testEmployeesIdDelete_NonExistingEmployee(EmployeeDTO requestDTO) {
+        // Arrange
+        int employeeId = requestDTO.getId().intValue();
+
+        when(employeeService.deleteEmployeeByID(employeeId)).thenReturn(Optional.empty());
+
+        // Act and Assert
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
+                employeeController.employeesIdDelete(employeeId));
+        assertEquals("Employee with ID " + employeeId + " not found.", exception.getMessage());
+        verify(employeeService, times(1)).deleteEmployeeByID(employeeId);
+        verify(employeeMapper, never()).employeeToDTO(any(Employee.class));
+    }
+}
