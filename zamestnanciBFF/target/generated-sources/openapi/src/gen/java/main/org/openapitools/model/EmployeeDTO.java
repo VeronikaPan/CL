@@ -20,7 +20,7 @@ import javax.annotation.Generated;
  * EmployeeDTO
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-20T10:00:20.201201900+02:00[Europe/Prague]")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-06-21T10:31:57.940423+02:00[Europe/Prague]")
 public class EmployeeDTO {
 
   @JsonProperty("id")

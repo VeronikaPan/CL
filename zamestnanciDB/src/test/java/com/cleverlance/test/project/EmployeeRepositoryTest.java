@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.cleverlance.test.project.repository.model.Employee;
-import com.cleverlance.test.project.repository.EmployeesRepository;
+import com.cleverlance.test.project.repository.IEmployeesRepository;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -20,7 +20,7 @@ public class EmployeeRepositoryTest {
 	// JpaRepository
 
 	@Autowired
-	private EmployeesRepository underTest;
+	private IEmployeesRepository underTest;
 
 	@AfterEach
 	void tearDown() {

@@ -4,7 +4,7 @@ import com.cleverlance.test.project.repository.model.Employee;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 
-public interface EmployeesRepository extends JpaRepository<Employee, Long> {
+public interface IEmployeesRepository extends JpaRepository<Employee, Long> {
 	
 
 }

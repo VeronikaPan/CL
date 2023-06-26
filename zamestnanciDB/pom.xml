@@ -2,9 +2,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.javainuse</groupId>
-	<artifactId>springboot-swagger-test</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>com.cleverlance.example</groupId>
+	<artifactId>zamestnanciDB</artifactId>
 	<packaging>jar</packaging>
 
 	<properties>
@@ -195,9 +194,13 @@
 			<version>1.18.20</version>
 			<scope>provided</scope>
 		</dependency>
+
+		<!-- Pro serializaci LocalDate do JSON -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+		</dependency>
 	</dependencies>
-
-
 	<build>
 		<plugins>
 			<plugin>

@@ -18,23 +18,32 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import com.cleverlance.test.project.repository.EmployeesRepository;
+import com.cleverlance.test.project.repository.IEmployeesRepository;
 import com.cleverlance.test.project.repository.model.Employee;
 import com.cleverlance.test.project.service.EmployeeService;
+import com.cleverlance.test.project.service.OutboxEventPublisher;
+import com.cleverlance.test.project.service.OutboxEventService;
+import com.cleverlance.test.project.service.kafka.JsonKafkaProducer;
 
 @TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class EmployeeServiceTest {
 
 	@Mock
-	private EmployeesRepository employeeRepository;
+	private IEmployeesRepository employeeRepository;
+	@Mock
+	private JsonKafkaProducer kafkaProducer;
+	@Mock
+	private OutboxEventService outservice;
+	@Mock
+	OutboxEventPublisher outboxEventPublisher;
 	private EmployeeService underTest;
 	private AutoCloseable autoCloseable;
 
 	@BeforeEach
 	void setUp() {
 		autoCloseable = MockitoAnnotations.openMocks(this);
-		employeeRepository = mock(EmployeesRepository.class);
-		underTest = new EmployeeService(employeeRepository);
+		employeeRepository = mock(IEmployeesRepository.class);
+		underTest = new EmployeeService(employeeRepository, kafkaProducer, outservice, outboxEventPublisher);
 	}
 
 	@AfterEach

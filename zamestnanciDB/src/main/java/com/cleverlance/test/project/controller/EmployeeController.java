@@ -33,7 +33,7 @@ public class EmployeeController implements EmployeesApi {
 		this.employeeMapper = employeeMapper;
 	}
 
-	//vrati vsechny zamestnance
+	// vrati vsechny zamestnance
 	@Override
 	public ResponseEntity<List<EmployeeDTO>> employeesGet() {
 		List<Employee> employees = employeeService.getAllEmployees();
@@ -60,28 +60,25 @@ public class EmployeeController implements EmployeesApi {
 	// prida zamestnance
 	@Override
 	public ResponseEntity<EmployeeDTO> employeesPost(EmployeeDTO employeeDTO) {
-	    Employee employee = employeeMapper.dtoToEmployee(employeeDTO);
-	    employeeService.addEmployee(employee);
-	    EmployeeDTO createdEmployeeDTO = employeeMapper.employeeToDTO(employee);
-	    return new ResponseEntity<>(createdEmployeeDTO, HttpStatus.OK);
+		Employee employee = employeeMapper.dtoToEmployee(employeeDTO);
+		employeeService.addEmployee(employee);
+		EmployeeDTO createdEmployeeDTO = employeeMapper.employeeToDTO(employee);
+		return new ResponseEntity<>(createdEmployeeDTO, HttpStatus.OK);
 	}
 
 	// upravi zamestnance
 	@Override
 	public ResponseEntity<EmployeeDTO> employeesIdPut(Integer id, EmployeeDTO employeeDTO) {
-	    Employee existingEmployee = employeeService.findEmployeeByID(id)
-	            .orElseThrow(() -> new IllegalArgumentException("Employee with ID " + id + " not found."));
-
-	    Employee updatedEmployee = employeeMapper.dtoToEmployee(employeeDTO);
-	    updatedEmployee.setId(existingEmployee.getId()); // Set the ID of the existing employee
-
-	    Optional<Employee> updatedEmployeeData = employeeService.updateEmployee(updatedEmployee);
-	    if (updatedEmployeeData.isPresent()) {
-	        EmployeeDTO updatedEmployeeDTO = employeeMapper.employeeToDTO(updatedEmployeeData.get());
-	        return new ResponseEntity<>(updatedEmployeeDTO, HttpStatus.OK);
-	    } else {
-	        throw new IllegalArgumentException("Employee with ID " + id + " not found.");
-	    }
+		Optional<Employee> existingEmployee = employeeService.findEmployeeByID(id);
+		if (existingEmployee.isPresent()) {
+			Employee updatedEmployee = employeeMapper.dtoToEmployee(employeeDTO);
+			updatedEmployee.setId(existingEmployee.get().getId()); // Set the ID of the existing employee
+			Optional<Employee> updatedEmployeeData = employeeService.updateEmployee(updatedEmployee);
+			return new ResponseEntity<EmployeeDTO>(HttpStatus.OK);
+		} else {
+			String errorMessage = "Employee with ID " + id + " not found.";
+			return new ResponseEntity<EmployeeDTO>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	// smaze zamestnance
@@ -92,7 +89,7 @@ public class EmployeeController implements EmployeesApi {
 	        EmployeeDTO deletedEmployeeDTO = employeeMapper.employeeToDTO(employeeData.get());
 	        return new ResponseEntity<>(deletedEmployeeDTO, HttpStatus.OK);
 	    } else {
-	        throw new IllegalArgumentException("Employee with ID " + id + " not found.");
+	    	return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
 	    }
 	}
 }
